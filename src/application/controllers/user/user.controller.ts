@@ -1,4 +1,5 @@
 import { CreateUserUseCase } from "../../useCases/user/createUser.useCase";
+import { DeleteUserUseCase } from "../../useCases/user/deleteUser.useCase";
 import { FindUserByIdUseCase } from "../../useCases/user/findUserById.useCase";
 import { FindUsersUseCase } from "../../useCases/user/findUsers.useCase";
 import { UpdateUserUseCase } from "../../useCases/user/updateUser.useCase";
@@ -14,7 +15,8 @@ export class UserController {
     private readonly createUserUseCase: CreateUserUseCase,
     private readonly findUserByIdUseCase: FindUserByIdUseCase,
     private readonly findUsersUseCase: FindUsersUseCase,
-    private readonly updateUserUseCase: UpdateUserUseCase
+    private readonly updateUserUseCase: UpdateUserUseCase,
+    private readonly deleteUserUseCase: DeleteUserUseCase
   ) {}
   async create(payload: CreateUserPayload) {
     const { name, email, address, coordinates } =
@@ -87,5 +89,8 @@ export class UserController {
     return user;
   }
 
-  delete() {}
+  async delete(id: string) {
+    const user = await this.deleteUserUseCase.execute(id);
+    return user;
+  }
 }

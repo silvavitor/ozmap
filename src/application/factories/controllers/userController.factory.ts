@@ -1,6 +1,7 @@
 import { UserController } from "../../controllers/user/user.controller";
 import { IResolveCoordinatesAndAddressService } from "../../interfaces/geolocalizationService.interface";
 import { makeCreateUserUseCase } from "../useCases/user/createUserUseCase.factory";
+import { makeDeleteUserUseCase } from "../useCases/user/deleteUserUseCase.factory";
 import { makeFindUserByIdUseCase } from "../useCases/user/findUserByIdUseCase.factory";
 import { makeFindUsersUseCase } from "../useCases/user/findUsersUseCase.factory";
 import { makeUpdateUserUseCase } from "../useCases/user/updateUserUseCase.factory";
@@ -12,11 +13,13 @@ export function makeUserController(service: Service) {
   const findUserByIdUseCase = makeFindUserByIdUseCase();
   const findUsersUseCase = makeFindUsersUseCase();
   const updateUserUseCase = makeUpdateUserUseCase(service);
+  const deleteUserUseCase = makeDeleteUserUseCase();
 
   return new UserController(
     createUserUseCase,
     findUserByIdUseCase,
     findUsersUseCase,
-    updateUserUseCase
+    updateUserUseCase,
+    deleteUserUseCase
   );
 }

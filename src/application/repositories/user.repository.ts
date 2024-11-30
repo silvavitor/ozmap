@@ -90,4 +90,8 @@ export class UserRepository implements IUserRepository {
   async findByEmail(email: string): Promise<User> {
     return null;
   }
+
+  delete(id: string): Promise<void> {
+    return;
+  }
 }
