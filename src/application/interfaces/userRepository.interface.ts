@@ -2,6 +2,7 @@ import { User } from "../models/user.model";
 import { Address } from "../types/address.type";
 import { Coordinates } from "../types/coordinates.type";
 import { Page } from "../types/page.type";
+import { PaginationFilter } from "../types/paginationFilter.type";
 
 export type UserRepositoryCreateParams = {
   name: string;
@@ -26,7 +27,7 @@ export type UserRepositoryFindParams = {
   state?: string;
   zipCode?: string;
   country?: string;
-};
+} & PaginationFilter;
 
 export interface IUserRepository {
   create(createUser: UserRepositoryCreateParams): Promise<User>;

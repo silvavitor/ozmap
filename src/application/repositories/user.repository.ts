@@ -1,3 +1,4 @@
+import { UserDatabase } from "../../database/models/databaseUser.model";
 import {
   IUserRepository,
   UserRepositoryCreateParams,
@@ -12,107 +13,58 @@ export class UserRepository implements IUserRepository {
     id: string,
     updateUser: UserRepositoryUpdateParams
   ): Promise<User> {
-    const user = new User({
-      id: "id",
-      name: "name",
-      email: "email",
-      coordinates: {
-        latitude: 1,
-        longitude: 2,
-      },
-      address: {
-        street: "Flower Street",
-        number: 123,
-        neighborhood: "Spring Garden",
-        state: "NY",
-        zipCode: "12345-678",
-        country: "USA",
-      },
-    });
-    return user;
+    const user = await UserDatabase.findByIdAndUpdate(
+      id,
+      { ...updateUser },
+      { new: true }
+    ).exec();
+    return user ? User.fromDatabase(user) : null;
   }
 
   async findPaginated(filter: UserRepositoryFindParams): Promise<Page<User>> {
-    const users = [
-      new User({
-        id: "id",
-        name: "name",
-        email: "email",
-        coordinates: {
-          latitude: 1,
-          longitude: 2,
-        },
-        address: {
-          street: "Flower Street",
-          number: 123,
-          neighborhood: "Spring Garden",
-          state: "NY",
-          zipCode: "12345-678",
-          country: "USA",
-        },
-      }),
-      new User({
-        id: "id",
-        name: "name",
-        email: "email",
-        coordinates: {
-          latitude: 1,
-          longitude: 2,
-        },
-        address: {
-          street: "Flower Street",
-          number: 123,
-          neighborhood: "Spring Garden",
-          state: "NY",
-          zipCode: "12345-678",
-          country: "USA",
-        },
-      }),
-    ];
+    const { limit, skip } = filter;
+
+    const query: any = {};
+
+    const users = await UserDatabase.find(query).skip(skip).limit(limit).exec();
+
+    const total = await UserDatabase.countDocuments(query).exec();
 
     return {
-      total: 2,
-      skip: 0,
-      data: users,
+      total,
+      skip: skip,
+      data: users.map((dbUser) => User.fromDatabase(dbUser)),
     };
   }
 
   async create(createUser: UserRepositoryCreateParams): Promise<User> {
-    const user = new User({
-      id: "id",
+    const mongoUser = new UserDatabase({
       name: createUser.name,
       email: createUser.email,
-      coordinates: createUser.coordinates,
+      coordinates: {
+        type: "Point",
+        coordinates: [
+          createUser.coordinates.longitude,
+          createUser.coordinates.latitude,
+        ],
+      },
       address: createUser.address,
     });
-    return user;
+    await mongoUser.save();
+    return User.fromDatabase(mongoUser);
   }
 
   async findById(id: string): Promise<User> {
-    return new User({
-      id: id,
-      name: "name",
-      email: "email",
-      coordinates: {
-        latitude: 1,
-        longitude: 2,
-      },
-      address: {
-        street: "Flower Street",
-        number: 123,
-        neighborhood: "Spring Garden",
-        state: "NY",
-        zipCode: "12345-678",
-        country: "USA",
-      },
-    });
+    const mongoUser = await UserDatabase.findById(id).exec();
+    return mongoUser ? User.fromDatabase(mongoUser) : null;
   }
 
   async findByEmail(email: string): Promise<User> {
-    return null;
+    const mongoUser = await UserDatabase.findOne({ email }).exec();
+    return mongoUser ? User.fromDatabase(mongoUser) : null;
   }
 
-  delete(id: string): Promise<void> {
-    return;
+  async delete(id: string): Promise<void> {
+    await UserDatabase.findByIdAndDelete(id).exec();
   }
 }
