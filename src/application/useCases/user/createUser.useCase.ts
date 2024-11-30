@@ -2,7 +2,10 @@ import { AddressOrCoordinatesMustBeProvidedError } from "../../errors/addressOrC
 import { EitherAddressOrCoordinatesMustBeProvidedError } from "../../errors/eitherAddressOrCoordinatesMusBeProvided.error";
 import { EmailAlreadyExists } from "../../errors/emailAlreadyExists.error";
 import { IResolveCoordinatesAndAddressService } from "../../interfaces/geolocalizationService.interface";
-import { IUserRepository } from "../../interfaces/userRepository.interface";
+import {
+  IUserRepository,
+  UserRepositoryCreateParams,
+} from "../../interfaces/userRepository.interface";
 import { User } from "../../models/user.model";
 import { Address } from "../../types/address.type";
 import { Coordinates } from "../../types/coordinates.type";
@@ -46,8 +49,13 @@ export class CreateUserUseCase {
         this.coordinatesAndAddressResolver.resolveAddress(createUser.address);
     }
 
-    console.log({ createUser });
+    const formattedNewUser: UserRepositoryCreateParams = {
+      name: createUser.name,
+      email: createUser.email,
+      address: createUser.address,
+      coordinates: createUser.coordinates,
+    };
 
-    return await this.userRepository.create(createUser);
+    return await this.userRepository.create(formattedNewUser);
   }
 }
