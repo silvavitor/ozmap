@@ -1,6 +1,6 @@
 import { AddressOrCoordinatesMustBeProvidedError } from "../../errors/addressOrCoordinatesMusBeProvidaded.error";
-import { EitherAddressOrCoordinatesMustBeProvidedError } from "../../errors/eitherAddressOrCoordinatesMusBeProvided.error";
 import { EmailAlreadyExists } from "../../errors/emailAlreadyExists.error";
+import { OnlyAddressOrCoordinatesMustBeProvidedError } from "../../errors/onlyAddressOrCoordinatesMusBeProvided.error";
 import { IResolveCoordinatesAndAddressService } from "../../interfaces/geolocalizationService.interface";
 import {
   IUserRepository,
@@ -32,7 +32,7 @@ export class CreateUserUseCase {
     }
 
     if (createUser.address && createUser.coordinates) {
-      throw new EitherAddressOrCoordinatesMustBeProvidedError();
+      throw new OnlyAddressOrCoordinatesMustBeProvidedError();
     }
 
     if (!createUser.address && !createUser.coordinates) {
