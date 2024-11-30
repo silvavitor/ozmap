@@ -32,19 +32,9 @@ export const createUserSchema = z
     }
   );
 
-export const updateUserSchema = z
-  .object({
-    name: z.string().optional(),
-    email: z.string().email().optional(),
-    address: AddressSchema.optional(),
-    coordinates: CoordinatesSchema.optional(),
-  })
-  .refine(
-    (data) =>
-      (data.address && !data.coordinates) ||
-      (!data.address && data.coordinates),
-    {
-      message: "Either address or coordinates must be provided, but not both.",
-      path: ["address", "coordinates"],
-    }
-  );
+export const updateUserSchema = z.object({
+  name: z.string().optional(),
+  email: z.string().email().optional(),
+  address: AddressSchema.optional(),
+  coordinates: CoordinatesSchema.optional(),
+});
