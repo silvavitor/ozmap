@@ -9,6 +9,8 @@ export class DeleteUserUseCase {
   async execute(id: string): Promise<void> {
     const user = await this.findUserByIdUseCase.execute(id);
 
+    console.log(`deleting user ${user.id}`);
+
     return await this.userRepository.delete(user.id);
   }
 }

@@ -42,6 +42,10 @@ export class UpdateUserUseCase {
 
     const userExists = await this.findUserByIdUseCase.execute(id);
 
+    console.log(
+      `updating user ${userExists.id}. [payload][${JSON.stringify(updateUser)}]`
+    );
+
     const formattedUpdatedUser: UserRepositoryUpdateParams = {
       ...updateUser,
     };
