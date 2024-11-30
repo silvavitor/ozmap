@@ -107,13 +107,13 @@ export class UserController {
               zipCode: address.zipCode,
               complement: address.complement,
             }
-          : null,
+          : undefined,
         coordinates: coordinates
           ? {
               latitude: coordinates.latitude,
               longitude: coordinates.longitude,
             }
-          : null,
+          : undefined,
       };
 
       const user = await this.updateUserUseCase.execute(id, updatedUser);
