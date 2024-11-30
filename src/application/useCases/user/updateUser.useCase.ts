@@ -1,5 +1,4 @@
 import { OnlyAddressOrCoordinatesMustBeProvidedError } from "../../errors/onlyAddressOrCoordinatesMusBeProvided.error";
-import { UserNotFoundError } from "../../errors/userNotFound.error";
 import { IResolveCoordinatesAndAddressService } from "../../interfaces/geolocalizationService.interface";
 import {
   IUserRepository,
@@ -42,10 +41,6 @@ export class UpdateUserUseCase {
     }
 
     const userExists = await this.findUserByIdUseCase.execute(id);
-
-    if (!userExists) {
-      throw new UserNotFoundError();
-    }
 
     const formattedUpdatedUser: UserRepositoryUpdateParams = {
       ...updateUser,
