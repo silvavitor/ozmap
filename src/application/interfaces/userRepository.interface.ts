@@ -1,6 +1,7 @@
 import { User } from "../models/user.model";
 import { Address } from "../types/address.type";
 import { Coordinates } from "../types/coordinates.type";
+import { Page } from "../types/page.type";
 
 export type UserRepositoryCreateParams = {
   name: string;
@@ -36,7 +37,7 @@ export interface IUserRepository {
 
   findByEmail(email: string): Promise<User>;
 
-  find(filter: UserRepositoryFindParams): Promise<User[]>;
+  findPaginated(filter: UserRepositoryFindParams): Promise<Page<User>>;
 
   delete(id: string): Promise<void>;
 }
