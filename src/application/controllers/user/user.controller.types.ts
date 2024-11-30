@@ -9,6 +9,8 @@ export type CreateUserPayload = {
   coordinates?: Coordinates;
 };
 
+export type UpdateUserPayload = Partial<CreateUserPayload>;
+
 export type FindAllUserFilter = {
   name?: string;
   address?: string;

@@ -2,10 +2,35 @@ import {
   IUserRepository,
   UserRepositoryCreateParams,
   UserRepositoryFindParams,
+  UserRepositoryUpdateParams,
 } from "../interfaces/userRepository.interface";
 import { User } from "../models/user.model";
 
 export class UserRepository implements IUserRepository {
+  async update(
+    id: string,
+    updateUser: UserRepositoryUpdateParams
+  ): Promise<User> {
+    const user = new User({
+      id: "id",
+      name: "name",
+      email: "email",
+      coordinates: {
+        latitude: 1,
+        longitude: 2,
+      },
+      address: {
+        street: "Flower Street",
+        number: 123,
+        neighborhood: "Spring Garden",
+        state: "NY",
+        zipCode: "12345-678",
+        country: "USA",
+      },
+    });
+    return user;
+  }
+
   async find(filter: UserRepositoryFindParams): Promise<User[]> {
     const users = [
       new User({

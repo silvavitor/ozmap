@@ -9,6 +9,13 @@ export type UserRepositoryCreateParams = {
   coordinates: Coordinates;
 };
 
+export type UserRepositoryUpdateParams = {
+  name?: string;
+  email?: string;
+  address?: Address;
+  coordinates?: Coordinates;
+};
+
 export type UserRepositoryFindParams = {
   name?: string;
   email?: string;
@@ -22,6 +29,8 @@ export type UserRepositoryFindParams = {
 
 export interface IUserRepository {
   create(createUser: UserRepositoryCreateParams): Promise<User>;
+
+  update(id: string, updateUser: UserRepositoryUpdateParams): Promise<User>;
 
   findById(id: string): Promise<User>;
 

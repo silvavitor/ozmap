@@ -1,14 +1,20 @@
 import { CreateUserUseCase } from "../../useCases/user/createUser.useCase";
 import { FindUserByIdUseCase } from "../../useCases/user/findUserById.useCase";
 import { FindUsersUseCase } from "../../useCases/user/findUsers.useCase";
-import { createUserSchema } from "./user.controller.schemas";
-import { CreateUserPayload, FindAllUserFilter } from "./user.controller.types";
+import { UpdateUserUseCase } from "../../useCases/user/updateUser.useCase";
+import { createUserSchema, updateUserSchema } from "./user.controller.schemas";
+import {
+  CreateUserPayload,
+  FindAllUserFilter,
+  UpdateUserPayload,
+} from "./user.controller.types";
 
 export class UserController {
   constructor(
     private readonly createUserUseCase: CreateUserUseCase,
     private readonly findUserByIdUseCase: FindUserByIdUseCase,
-    private readonly findUsersUseCase: FindUsersUseCase
+    private readonly findUsersUseCase: FindUsersUseCase,
+    private readonly updateUserUseCase: UpdateUserUseCase
   ) {}
   async create(payload: CreateUserPayload) {
     const { name, email, address, coordinates } =
@@ -50,7 +56,36 @@ export class UserController {
     return users;
   }
 
-  update() {}
+  async update(id: string, payload: UpdateUserPayload) {
+    const { name, email, address, coordinates } =
+      updateUserSchema.parse(payload);
+
+    const updatedUser = {
+      name,
+      email,
+      address: address
+        ? {
+            street: address.street,
+            country: address.country,
+            neighborhood: address.neighborhood,
+            number: address.number,
+            state: address.state,
+            zipCode: address.zipCode,
+            complement: address.complement,
+          }
+        : null,
+      coordinates: coordinates
+        ? {
+            latitude: coordinates.latitude,
+            longitude: coordinates.longitude,
+          }
+        : null,
+    };
+
+    const user = await this.updateUserUseCase.execute(id, updatedUser);
+
+    return user;
+  }
 
   delete() {}
 }
