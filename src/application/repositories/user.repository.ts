@@ -5,6 +5,7 @@ import {
   UserRepositoryUpdateParams,
 } from "../interfaces/userRepository.interface";
 import { User } from "../models/user.model";
+import { Page } from "../types/page.type";
 
 export class UserRepository implements IUserRepository {
   async update(
@@ -31,7 +32,7 @@ export class UserRepository implements IUserRepository {
     return user;
   }
 
-  async find(filter: UserRepositoryFindParams): Promise<User[]> {
+  async findPaginated(filter: UserRepositoryFindParams): Promise<Page<User>> {
     const users = [
       new User({
         id: "id",
@@ -69,7 +70,11 @@ export class UserRepository implements IUserRepository {
       }),
     ];
 
-    return users;
+    return {
+      total: 2,
+      skip: 0,
+      data: users,
+    };
   }
 
   async create(createUser: UserRepositoryCreateParams): Promise<User> {
@@ -84,7 +89,23 @@ export class UserRepository implements IUserRepository {
   }
 
   async findById(id: string): Promise<User> {
-    return new User();
+    return new User({
+      id: id,
+      name: "name",
+      email: "email",
+      coordinates: {
+        latitude: 1,
+        longitude: 2,
+      },
+      address: {
+        street: "Flower Street",
+        number: 123,
+        neighborhood: "Spring Garden",
+        state: "NY",
+        zipCode: "12345-678",
+        country: "USA",
+      },
+    });
   }
 
   async findByEmail(email: string): Promise<User> {
