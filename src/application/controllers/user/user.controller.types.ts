@@ -1,5 +1,6 @@
 import { Address } from "../../types/address.type";
 import { Coordinates } from "../../types/coordinates.type";
+import { PaginationFilter } from "../../types/paginationFilter.type";
 
 export type CreateUserPayload = {
   name: string;
@@ -7,3 +8,8 @@ export type CreateUserPayload = {
   address?: Address;
   coordinates?: Coordinates;
 };
+
+export type FindAllUserFilter = {
+  name?: string;
+  address?: string;
+} & PaginationFilter;

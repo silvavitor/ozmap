@@ -1,14 +1,59 @@
-import { IUserRepository } from "../interfaces/userRepository.interface";
+import {
+  IUserRepository,
+  UserRepositoryCreateParams,
+  UserRepositoryFindParams,
+} from "../interfaces/userRepository.interface";
 import { User } from "../models/user.model";
 
 export class UserRepository implements IUserRepository {
-  async create(createUser: any): Promise<User> {
+  async find(filter: UserRepositoryFindParams): Promise<User[]> {
+    const users = [
+      new User({
+        id: "id",
+        name: "name",
+        email: "email",
+        coordinates: {
+          latitude: 1,
+          longitude: 2,
+        },
+        address: {
+          street: "Flower Street",
+          number: 123,
+          neighborhood: "Spring Garden",
+          state: "NY",
+          zipCode: "12345-678",
+          country: "USA",
+        },
+      }),
+      new User({
+        id: "id",
+        name: "name",
+        email: "email",
+        coordinates: {
+          latitude: 1,
+          longitude: 2,
+        },
+        address: {
+          street: "Flower Street",
+          number: 123,
+          neighborhood: "Spring Garden",
+          state: "NY",
+          zipCode: "12345-678",
+          country: "USA",
+        },
+      }),
+    ];
+
+    return users;
+  }
+
+  async create(createUser: UserRepositoryCreateParams): Promise<User> {
     const user = new User({
       id: "id",
       name: createUser.name,
       email: createUser.email,
       coordinates: createUser.coordinates,
-      address: createUser.addres,
+      address: createUser.address,
     });
     return user;
   }

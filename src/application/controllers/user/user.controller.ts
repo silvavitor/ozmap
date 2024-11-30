@@ -1,12 +1,14 @@
 import { CreateUserUseCase } from "../../useCases/user/createUser.useCase";
 import { FindUserByIdUseCase } from "../../useCases/user/findUserById.useCase";
+import { FindUsersUseCase } from "../../useCases/user/findUsers.useCase";
 import { createUserSchema } from "./user.controller.schemas";
-import { CreateUserPayload } from "./user.controller.types";
+import { CreateUserPayload, FindAllUserFilter } from "./user.controller.types";
 
 export class UserController {
   constructor(
     private readonly createUserUseCase: CreateUserUseCase,
-    private readonly findUserByIdUseCase: FindUserByIdUseCase
+    private readonly findUserByIdUseCase: FindUserByIdUseCase,
+    private readonly findUsersUseCase: FindUsersUseCase
   ) {}
   async create(payload: CreateUserPayload) {
     const { name, email, address, coordinates } =
@@ -42,7 +44,11 @@ export class UserController {
     return user;
   }
 
-  findAll() {}
+  async findAll(filter?: FindAllUserFilter) {
+    const users = await this.findUsersUseCase.execute(filter);
+
+    return users;
+  }
 
   update() {}
 
