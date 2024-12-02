@@ -9,9 +9,9 @@ import { Address } from "../../types/address.type";
 import { Coordinates } from "../../types/coordinates.type";
 import { FindUserByIdUseCase } from "./findUserById.useCase";
 
-export type CreateUserUseCaseParams = {
-  name: string;
-  email: string;
+export type UpdateUserUseCaseParams = {
+  name?: string;
+  email?: string;
   address?: Address;
   coordinates?: Coordinates;
 };
@@ -24,7 +24,7 @@ export class UpdateUserUseCase {
   ) {}
   async execute(
     id: string,
-    updateUser: CreateUserUseCaseParams
+    updateUser: UpdateUserUseCaseParams
   ): Promise<User> {
     if (updateUser.address && updateUser.coordinates) {
       throw new OnlyAddressOrCoordinatesMustBeProvidedError();
@@ -32,12 +32,14 @@ export class UpdateUserUseCase {
 
     if (updateUser.coordinates) {
       updateUser.address =
-        this.coordinatesAndAddressResolver.resolveCoordinates(
+        await this.coordinatesAndAddressResolver.resolveCoordinates(
           updateUser.coordinates
         );
     } else if (updateUser.address) {
       updateUser.coordinates =
-        this.coordinatesAndAddressResolver.resolveAddress(updateUser.address);
+        await this.coordinatesAndAddressResolver.resolveAddress(
+          updateUser.address
+        );
     }
 
     const userExists = await this.findUserByIdUseCase.execute(id);

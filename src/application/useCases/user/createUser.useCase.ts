@@ -28,7 +28,7 @@ export class CreateUserUseCase {
     );
 
     if (userWithEmailExists) {
-      throw new EmailAlreadyExists();
+      throw new EmailAlreadyExists("this e-mail already exists");
     }
 
     if (createUser.address && createUser.coordinates) {
@@ -41,12 +41,14 @@ export class CreateUserUseCase {
 
     if (createUser.coordinates) {
       createUser.address =
-        this.coordinatesAndAddressResolver.resolveCoordinates(
+        await this.coordinatesAndAddressResolver.resolveCoordinates(
           createUser.coordinates
         );
     } else if (createUser.address) {
       createUser.coordinates =
-        this.coordinatesAndAddressResolver.resolveAddress(createUser.address);
+        await this.coordinatesAndAddressResolver.resolveAddress(
+          createUser.address
+        );
     }
 
     const formattedNewUser: UserRepositoryCreateParams = {

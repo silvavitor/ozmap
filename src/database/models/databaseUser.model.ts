@@ -1,7 +1,8 @@
 import mongoose, { Document, Schema } from "mongoose";
 import { Address } from "../../application/types/address.type";
+import { RegionMongo } from "./databaseRegion.model";
 
-type DBCoordinates = {
+type DBUserCoordinates = {
   type: string;
   coordinates: number[];
 };
@@ -10,7 +11,8 @@ export interface UserMongo extends Document {
   name: string;
   email: string;
   address: Address;
-  coordinates: DBCoordinates;
+  coordinates: DBUserCoordinates;
+  regions: RegionMongo[];
 }
 
 const userSchema = new Schema<UserMongo>(
@@ -32,6 +34,7 @@ const userSchema = new Schema<UserMongo>(
         required: true,
       },
     },
+    regions: [{ type: Schema.Types.ObjectId, ref: "Region", required: true }],
   },
   { timestamps: true }
 );

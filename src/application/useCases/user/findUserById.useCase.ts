@@ -1,4 +1,4 @@
-import { UserNotFoundError } from "../../errors/userNotFound.error";
+import { NotFoundError } from "../../errors/userNotFound.error";
 import { IUserRepository } from "../../interfaces/userRepository.interface";
 import { User } from "../../models/user.model";
 
@@ -8,7 +8,7 @@ export class FindUserByIdUseCase {
     const user = await this.userRepository.findById(id);
 
     if (!user) {
-      throw new UserNotFoundError(`user ${id} not found`);
+      throw new NotFoundError(`user ${id} not found`);
     }
 
     return user;

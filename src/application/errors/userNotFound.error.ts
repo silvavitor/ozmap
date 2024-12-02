@@ -1,7 +1,7 @@
 import { HttpStatus } from "../enums/httpStatus.enum";
 import { CustomBaseError } from "./customBaseError";
 
-export class UserNotFoundError extends CustomBaseError {
-  name = "UserNotFoundError";
+export class NotFoundError extends CustomBaseError {
+  name = "NotFoundError";
   statusCode = HttpStatus.NOT_FOUND;
 }
