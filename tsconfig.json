@@ -6,7 +6,7 @@
     "experimentalDecorators": true,
     "sourceMap": true
   },
-  "types": ["reflect-metadata", "mocha"],
+  "types": ["reflect-metadata", "jest"],
   "exclude": [
     "node_modules"
   ]
