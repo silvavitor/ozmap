@@ -1,82 +1,607 @@
-# OZmap Challenge: Construindo a Geolocalização do Futuro
+# Descrição
 
-Olá desenvolvedor(a)! Bem-vindo(a) ao Desafio Técnico do OZmap. Este é um projeto que simula um cenário real de nossa empresa, onde você irá desempenhar um papel crucial ao desenvolver uma API RESTful robusta para gerenciar usuários e localizações. Estamos muito animados para ver sua abordagem e solução!
+Estamos ansiosos para ver sua implementação e criatividade em ação! Boa sorte e que a força do código esteja com você! 🚀
 
-## 🌍 **Visão Geral**
+O sistema foi desenvolvido priorizando o desacoplamento de camadas, para isso temos repositories e suas interfaces que possibilitam a alteração da fonte de dados(muito útil para mockar para os testes), factories para criar os controllers e useCases e injetar suas dependências. A parte mais externa da regra de negócio são os controllers, que podem ser utilizados pelo “server”(independente de framework/biblioteca). A parte mais interna são as regras de negócios que ficam em um useCase, esse não sabe quem o chama e não sabe como a fonte de dados pega os valores que necessita, apenas executa os passos para realizar a tarefa.
 
-Em um mundo conectado e globalizado, a geolocalização se torna cada vez mais essencial. E aqui no OZmap, buscamos sempre otimizar e melhorar nossos sistemas. Assim, você encontrará um protótipo que precisa de sua experiência para ser corrigido, melhorado e levado ao próximo nível.
+A parte de implementacao(server) foi construída com express e a ali de geolocalização utilizada foi a do Google Maps.
 
-## 🛠 **Especificações Técnicas**
+# Para rodar
 
-- **Node.js**: Versão 20 ou superior.
-- **Banco de Dados**: Mongo 7+.
-- **ORM**: Mongoose / Typegoose.
-- **Linguagem**: Typescript.
-- **Formatação e Linting**: Eslint + prettier.
-- **Comunicação com MongoDB**: Deve ser feita via container.
+```
+docker-compose up --build
+```
 
-## 🔍 **Funcionalidades Esperadas**
+e acessar `http://localhost:3000`, é necessário configurar a chave de api do Google.
 
-### Usuários
-- **CRUD** completo para usuários.
-- Cada usuário deve ter nome, email, endereço e coordenadas.
-- Na criação, o usuário pode fornecer endereço ou coordenadas. Haverá erro caso forneça ambos ou nenhum.
-- Uso de serviço de geolocalização para resolver endereço ↔ coordenadas.
-- Atualização de endereço ou coordenadas deve seguir a mesma lógica.
+# Para testar
 
-### Regiões
-- **CRUD** completo para regiões.
-- Uma região é definida como um polígono em GeoJSON, um formato padrão para representar formas geográficas. Cada região tem um nome, um conjunto de coordenadas que formam o polígono, e um usuário que será o dono da região.
-- Listar regiões contendo um ponto específico.
-- Listar regiões a uma certa distância de um ponto, com opção de filtrar regiões não pertencentes ao usuário que fez a requisição.
-- Exemplo de um polígono simples em GeoJSON:
+```
+yarn test
+```
+
+# API de Usuários
+
+## Endpoints
+
+<details>
+  <summary>Criar Usuário - POST /users/</summary>
+  
+  **Descrição:** Cria um novo usuário no sistema.  
+  **Body:**  
   ```json
   {
-    "type": "Polygon",
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "address": {
+      "street": "Main St",
+      "neighborhood": "Downtown",
+      "number": 123,
+      "state": "Anystate",
+      "zipCode": "12345",
+      "country": "Country",
+    },
+    "coordinates": {
+      "latitude": 40.7128,
+      "longitude": -74.006,
+    }
+  }  
+  ```
+  **Resposta de Sucesso (201):**  
+  ```json
+  {
+    "id": "123",
+    "name": "John Doe",
+    "email": "john.doe@example.com",
+    "address": {
+      "street": "Main St",
+      "neighborhood": "Downtown",
+      "number": 123,
+      "state": "Anystate",
+      "zipCode": "12345",
+      "country": "Country",
+    },
+    "coordinates": {
+      "latitude": 40.7128,
+      "longitude": -74.006,
+    }
+  }
+  ```
+</details>
+
+<details>
+  <summary>Listar Usuários - GET /users/</summary>
+  
+  **Descrição:** Retorna uma lista de usuários paginada.  
+  **Query Params:**  
+  - `skip`: Número de usuários a pular (opcional).  
+  - `limit`: Número de usuários a retornar (opcional).  
+  **Exemplo de Requisição:** `/users/?skip=0&limit=10`  
+  **Resposta de Sucesso (200):**
+  ```json
+  {
+    "total": 2,
+    "users": [
+      {
+        "id": "123",
+        "name": "John Doe",
+        "email": "john.doe@example.com",
+        "address": {
+          "street": "Main St",
+          "neighborhood": "Downtown",
+          "number": 123,
+          "state": "Anystate",
+          "zipCode": "12345",
+          "country": "Country",
+        },
+        "coordinates": {
+          "latitude": 40.7128,
+          "longitude": -74.006,
+        }
+      },
+      {
+        "id": "124",
+        "name": "Jane",
+        "email": "jane@example.com",
+        "address": {
+          "street": "Main St",
+          "neighborhood": "Downtown",
+          "number": 123,
+          "state": "Anystate",
+          "zipCode": "12345",
+          "country": "Country",
+        },
+        "coordinates": {
+          "latitude": 40.7128,
+          "longitude": -74.006,
+        }
+      }
+    ]
+  }  
+  ```  
+  {
+    "total": 2,
+    "users": [
+      {
+        "id": "123",
+        "name": "John Doe",
+        "email": "john.doe@example.com"
+      },
+      {
+        "id": "124",
+        "name": "Jane Smith",
+        "email": "jane.smith@example.com"
+      }
+    ]
+  }
+</details>
+
+<details>
+  <summary>Buscar Usuário por ID - GET /users/:id</summary>
+  
+  **Descrição:** Retorna os detalhes de um usuário específico.  
+  **Parâmetro de URL:**  
+  - `id`: ID do usuário.  
+  **Resposta de Sucesso (200):**  
+  ```json
+  {
+    "name": "John Updated",
+    "email": "john.updated@example.com",
+    "address": {
+      "street": "Main St",
+      "neighborhood": "Downtown",
+      "number": 123,
+      "state": "Anystate",
+      "zipCode": "12345",
+      "country": "Country",
+    },
+    "coordinates": {
+      "latitude": 40.7128,
+      "longitude": -74.006,
+    }
+  }  
+  ```
+</details>
+
+<details>
+  <summary>Atualizar Usuário - PATCH /users/:id</summary>
+  
+  **Descrição:** Atualiza os dados de um usuário específico.  
+  **Parâmetro de URL:**  
+  - `id`: ID do usuário.  
+  **Body:**  
+  ```json
+  {
+    "name": "John Updated",
+    "email": "john.updated@example.com",
+    "address": {
+      "street": "Main St",
+      "neighborhood": "Downtown",
+      "number": 123,
+      "state": "Anystate",
+      "zipCode": "12345",
+      "country": "Country",
+    },
+    "coordinates": {
+      "latitude": 40.7128,
+      "longitude": -74.006,
+    }
+  }  
+  ```
+  **Resposta de Sucesso (200):**  
+  ```json 
+  {
+    "id": "123",
+    "name": "John Updated",
+    "email": "john.updated@example.com",
+    "address": {
+      "street": "Main St",
+      "neighborhood": "Downtown",
+      "number": 123,
+      "state": "Anystate",
+      "zipCode": "12345",
+      "country": "Country",
+    },
+    "coordinates": {
+      "latitude": 40.7128,
+      "longitude": -74.006,
+    }
+  }
+  ```
+</details>
+
+<details>
+  <summary>Deletar Usuário - DELETE /users/:id</summary>
+  
+  **Descrição:** Remove um usuário do sistema.  
+  **Parâmetro de URL:**  
+  - `id`: ID do usuário.  
+  **Resposta de Sucesso (204):**  
+  Sem conteúdo.
+</details>
+
+# API de Regiões
+
+## Endpoints
+
+<details>
+  <summary>Criar Região - POST /regions/</summary>
+  
+  **Descrição:** Cria uma nova região no sistema.  
+  **Body:**  
+  ```json
+  {
+    "name": "Região Central",
+    "userId": "123",
     "coordinates": [
       [
-        [longitude1, latitude1],
-        [longitude2, latitude2],
-        [longitude3, latitude3],
-        [longitude1, latitude1] // Fecha o polígono
+        {
+          "latitude": -23.55052,
+          "longitude": -46.633308
+        },
+        {
+          "latitude": -23.551,
+          "longitude": -46.634
+        }
+      ]
+    ]
+  }  
+  ```
+  **Resposta de Sucesso (201):**  
+  ```json
+  {
+    "name": "Região Central",
+    "user": {
+      "id": "123",
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "address": {
+        "street": "123 Main St",
+        "number": 10,
+        "neighborhood": "Centro",
+        "state": "SP",
+        "zipCode": "12345-678",
+        "country": "Brasil"
+      },
+      "coordinates": {
+        "latitude": -23.55052,
+        "longitude": -46.633308
+      }
+    },
+    "coordinates": [
+      [
+        {
+          "latitude": -23.55052,
+          "longitude": -46.633308
+        },
+        {
+          "latitude": -23.551,
+          "longitude": -46.634
+        }
+      ]
+    ]
+  }  
+```
+</details>
+
+<details>
+  <summary>Listar Regiões - GET /regions/</summary>
+  
+  **Descrição:** Retorna uma lista de regiões paginada.  
+  **Query Params:**  
+  - `skip`: Número de registros a pular (opcional).  
+  - `limit`: Número de registros a retornar (opcional).  
+  **Exemplo de Requisição:** `/regions/?skip=0&limit=10`  
+  **Resposta de Sucesso (200):**
+  ```json  
+  {
+    "total": 2,
+    "skip": 0,
+    "regions": [
+      {
+        "id": "100",
+        "name": "Região Central",
+        "user": {
+          "id": "123",
+          "name": "John Doe",
+          "email": "john.doe@example.com",
+          "address": {
+            "street": "123 Main St",
+            "number": 10,
+            "neighborhood": "Centro",
+            "state": "SP",
+            "zipCode": "12345-678",
+            "country": "Brasil"
+          },
+          "coordinates": {
+            "latitude": -23.55052,
+            "longitude": -46.633308
+          }
+        },
+        "coordinates": [
+          [
+            {
+              "latitude": -23.55052,
+              "longitude": -46.633308
+            },
+            {
+              "latitude": -23.551,
+              "longitude": -46.634
+            }
+          ]
+        ]
+      },
+      {
+        "id": "101",
+        "name": "Região Norte",
+        "user": {
+          "id": "123",
+          "name": "John Doe",
+          "email": "john.doe@example.com",
+          "address": {
+            "street": "123 Main St",
+            "number": 10,
+            "neighborhood": "Centro",
+            "state": "SP",
+            "zipCode": "12345-678",
+            "country": "Brasil"
+          },
+          "coordinates": {
+            "latitude": -23.55052,
+            "longitude": -46.633308
+          }
+        },
+        "coordinates": [
+          [
+            {
+              "latitude": -23.55052,
+              "longitude": -46.633308
+            },
+            {
+              "latitude": -23.551,
+              "longitude": -46.634
+            }
+          ]
+        ]
+      } 
+    ]
+  }
+  ```
+</details>
+
+<details>
+  <summary>Buscar Região por ID - GET /regions/:id</summary>
+  
+  **Descrição:** Retorna os detalhes de uma região específica.  
+  **Parâmetro de URL:**  
+  - `id`: ID da região.  
+  **Resposta de Sucesso (200):**  
+  ```json
+  {
+    "id": "100",
+    "name": "Região Central",
+    "user": {
+      "id": "123",
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "address": {
+        "street": "123 Main St",
+        "number": 10,
+        "neighborhood": "Centro",
+        "state": "SP",
+        "zipCode": "12345-678",
+        "country": "Brasil"
+      },
+      "coordinates": {
+        "latitude": -23.55052,
+        "longitude": -46.633308
+      }
+    },
+    "coordinates": [
+      [
+        {
+          "latitude": -23.55052,
+          "longitude": -46.633308
+        },
+        {
+          "latitude": -23.551,
+          "longitude": -46.634
+        }
       ]
     ]
   }
   ```
+</details>
 
-### Testes
-- Unitários e de integração.
+<details>
+  <summary>Buscar Região por Coordenadas - GET /regions/coordinates</summary>
+  
+  **Descrição:** Retorna as regiões que incluem as coordenadas fornecidas.  
+  **Query Params:**  
+  - `skip`: Número de registros a pular (opcional).  
+  - `limit`: Número de registros a retornar (opcional).  
+  **Body:**  
+  ```json
+  {
+    "coordinates": {
+      "latitude": -23.55052,
+      "longitude": -46.633308
+    }
+  }  
+  ```
+  **Resposta de Sucesso (200):**  
+  ```json
+  {
+    "total": 1,
+    "skip": 0,
+    "regions": [
+      {
+        "id": "100",
+        "name": "Região Central",
+        "user": {
+          "id": "123",
+          "name": "John Doe",
+          "email": "john.doe@example.com",
+          "address": {
+            "street": "123 Main St",
+            "number": 10,
+            "neighborhood": "Centro",
+            "state": "SP",
+            "zipCode": "12345-678",
+            "country": "Brasil"
+          },
+          "coordinates": {
+            "latitude": -23.55052,
+            "longitude": -46.633308
+          }
+        },
+        "coordinates": [
+          [
+            {
+              "latitude": -23.55052,
+              "longitude": -46.633308
+            },
+            {
+              "latitude": -23.551,
+              "longitude": -46.634
+            }
+          ]
+        ]
+      }
+    ]
+  }
+  ```
+</details>
 
-## 🌟 **Diferenciais**
+<details>
+  <summary>Buscar Região por Distância de Coordenadas - GET /regions/coordinates/distance</summary>
+  
+  **Descrição:** Retorna as regiões dentro de uma distância especificada das coordenadas fornecidas.  
+  **Query Params:**  
+  - `skip`: Número de registros a pular (opcional).  
+  - `limit`: Número de registros a retornar (opcional).  
+  **Body:** 
+  ```json
+  {
+    "coordinates": {
+      "latitude": -23.55052,
+      "longitude": -46.633308
+    },
+    "distance": 1000 // metros
+  }  
+  ``` 
+  **Resposta de Sucesso (200):**  
+  ```json
+  {
+    "total": 1,
+    "skip": 0,
+    "regions": [
+      {
+        "id": "100",
+        "name": "Região Central",
+        "user": {
+          "id": "123",
+          "name": "John Doe",
+          "email": "john.doe@example.com",
+          "address": {
+            "street": "123 Main St",
+            "number": 10,
+            "neighborhood": "Centro",
+            "state": "SP",
+            "zipCode": "12345-678",
+            "country": "Brasil"
+          },
+          "coordinates": {
+            "latitude": -23.55052,
+            "longitude": -46.633308
+          }
+        },
+        "coordinates": [
+          [
+            {
+              "latitude": -23.55052,
+              "longitude": -46.633308
+            },
+            {
+              "latitude": -23.551,
+              "longitude": -46.634
+            }
+          ]
+        ]
+      }
+    ]
+  }
+  ```
+</details>
 
-- Autenticação não é requisito, podendo então o usuário ser fornecido junto do corpo da requisição. Caso implemente autenticação, o usuário deve ser obtido a partir do token.
-- Interface básica de usuário.
-- Documentação completa da API.
-- Internacionalização.
-- Cobertura de código.
-- Utilização de mongo session
+<details>
+  <summary>Atualizar Região - PATCH /regions/:id</summary>
+  
+  **Descrição:** Atualiza os dados de uma região específica.  
+  **Parâmetro de URL:**  
+  - `id`: ID da região.  
+  **Body:**  
+  ```json
+  {
+    "name": "Região Atualizada",
+    "coordinates": [
+      [
+        {
+          "latitude": -23.55052,
+          "longitude": -46.633308
+        },
+        {
+          "latitude": -23.552,
+          "longitude": -46.635
+        }
+      ]
+    ]
+  }  
+  ```
+  **Resposta de Sucesso (200):** 
+  ```json
+  {
+    "id": "100",
+    "name": "Região Atualizada",
+    "user": {
+      "id": "123",
+      "name": "John Doe",
+      "email": "john.doe@example.com",
+      "address": {
+        "street": "123 Main St",
+        "number": 10,
+        "neighborhood": "Centro",
+        "state": "SP",
+        "zipCode": "12345-678",
+        "country": "Brasil"
+      },
+      "coordinates": {
+        "latitude": -23.55052,
+        "longitude": -46.633308
+      }
+    },
+    "coordinates": [
+      [
+        {
+          "latitude": -23.55052,
+          "longitude": -46.633308
+        },
+        {
+          "latitude": -23.552,
+          "longitude": -46.635
+        }
+      ]
+    ]
+  }
+  ```
+</details>
 
-## ⚖ **Critérios de Avaliação**
-
-1. Organização e clareza do código.
-2. Estruturação do projeto.
-3. Qualidade e eficiência do código.
-4. Cobertura e qualidade de testes.
-5. Pontos diferenciais citados acima.
-6. Tempo de entrega.
-7. Padronização e clareza das mensagens de erro.
-8. Organização dos commits.
-9. Implementação de logs.
-10. Adesão às boas práticas de API RESTful.
-
-## 🚀 **Entrega**
-
-1. Crie um repositório público com a base desse código.
-2. Crie uma branch para realizar o seu trabalho.
-3. Ao finalizar, faça um pull request para a branch `main` deste repositório.
-4. Envie um email para `rh@ozmap.com.br` informando que o teste foi concluído.
-5. Aguarde nosso feedback.
-
----
-
-Estamos ansiosos para ver sua implementação e criatividade em ação! Boa sorte e que a força do código esteja com você! 🚀
+<details>
+  <summary>Deletar Região - DELETE /regions/:id</summary>
+  
+  **Descrição:** Remove uma região do sistema.  
+  **Parâmetro de URL:**  
+  - `id`: ID da região.  
+  **Resposta de Sucesso (204):**  
+  Sem conteúdo.
+</details>
