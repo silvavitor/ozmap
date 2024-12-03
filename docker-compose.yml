@@ -11,6 +11,22 @@ services:
     networks:
       - mongo_network
 
+  express:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: express_container
+    ports:
+      - "3000:3000"
+    networks:
+      - mongo_network
+    environment:
+      MONGO_URI: mongodb://mongo_container:27017/ozmap
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+
 networks:
   mongo_network:
     driver: bridge
